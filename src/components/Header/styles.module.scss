@@ -1,0 +1,99 @@
+.headerContainer {
+  height: 5rem;
+  width: 100%; // Certifique-se de que o header ocupa 100% da largura
+}
+
+.headerContent {
+  max-width: 100%;
+  height: 5rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  img {
+    cursor: pointer;
+  }
+}
+
+.menuNav {
+  display: flex;
+  align-items: center;
+  flex-grow: 1; // Permite que o menu cresça para ocupar o espaço disponível
+  justify-content: flex-end; // Alinha o menu à direita
+
+  a {
+    color: var(--white);
+    padding: 0 0.5rem;
+    white-space: nowrap; // Garante que o texto não quebre
+    display: inline-block;
+    position: relative;
+    transition: color 0.7s;
+
+    & + a {
+      margin-left: 2rem;
+    }
+
+    &:hover {
+      color: var(--red-900);
+    }
+  }
+
+  button {
+    margin-left: 2rem;
+    background: transparent;
+    border: 0;
+    transition: transform 0.8s;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  .profileContainer {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    margin-left: 2%;
+    color: var(--white);
+
+    .profilePhoto {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .dropdownMenu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: grayscale($color: #dfdede);
+      border: 1px solid var(--gray-100);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+      padding: 0.5rem;
+      z-index: 1000;
+
+      a, button {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: var(--black);
+        text-decoration: none;
+        transition: background 0.3s;
+
+        &:hover {
+          background: var(--gray-100);
+        }
+      }
+
+      button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+    }
+  }
+}

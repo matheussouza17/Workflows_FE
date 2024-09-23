@@ -1,0 +1,33 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .infoSection {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+    justify-content: center;
+  }
+  
+  .infoCard {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+  }
+  
+  .infoCard h2 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .infoCard p {
+    color: #666;
+  }
+  

@@ -1,0 +1,22 @@
+.select {
+    margin-bottom: 1rem;
+    height: 40px;
+    border: 0;
+    border-radius: 0.5rem;
+    background-color: var(--dark-900);
+    color: var(--white);
+    padding: 0.5rem 1rem;  // Ajuste no padding para melhorar a visibilidade do texto
+    border: 1px solid var(--gray-100);
+    appearance: none;  // Remove o estilo padrão do navegador para select
+  
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  
+    // Adicionando um ícone de seta para o select
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="white" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 8px 10px;
+  }
+  

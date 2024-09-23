@@ -1,0 +1,48 @@
+// styles/PhotoPopup.module.scss
+.popupContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(16, 16, 38, 0.9); /* Usando var(--dark-900) com opacidade */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .popupContent {
+    background-color: var(--dark-700);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    h2{
+        color: var(--white);
+        margin-bottom: 2rem;
+    }
+  }
+  
+  .photoGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .photoItem {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+  }
+  
+  .photoItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .actions {
+    text-align: right;
+    margin-top: 1rem;
+  }
+  
