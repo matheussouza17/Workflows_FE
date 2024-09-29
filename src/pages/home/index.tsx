@@ -5,7 +5,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
 
-export default function Dashboard() {
+export default function Home() {
   const { user } = useContext(AuthContext);
 
   return (

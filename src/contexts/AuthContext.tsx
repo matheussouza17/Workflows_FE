@@ -102,7 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
             toast.success("Login realizado com sucesso!");
-            Router.push('/dashboard'); // Ajuste para o workflow
+            Router.push('/home'); 
         }
         catch (err) {
             console.log('Erro ao acessar ', err);
