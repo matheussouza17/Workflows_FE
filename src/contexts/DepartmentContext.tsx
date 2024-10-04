@@ -14,6 +14,7 @@ type DepartmentContextData = {
   loading: boolean;
   fetchDepartments: () => Promise<void>;
   fetchDepartmentById: (id: number) => Promise<void>;
+  updateDepartment: (id: number, data: Partial<Department>) => Promise<void>;
 };
 
 type DepartmentProviderProps = {
@@ -47,14 +48,28 @@ export function DepartmentProvider({ children }: DepartmentProviderProps) {
       const response = await api.get(`/department/${id}`);
       setDepartment(response.data);
     } catch (error) {
-      console.error('Erro ao buscar o departamento:', error);
+      console.error("Erro ao buscar detalhes do departamento:", error);
+      setDepartment(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Update department by ID
+  async function updateDepartment(id: number, data: Partial<Department>) {
+    setLoading(true);
+    try {
+      await api.put(`/department/${id}`, data);
+      await fetchDepartmentById(id); // Atualiza o estado do departamento após a atualização
+    } catch (error) {
+      console.error("Erro ao atualizar departamento:", error);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <DepartmentContext.Provider value={{ departments, department, loading, fetchDepartments, fetchDepartmentById }}>
+    <DepartmentContext.Provider value={{ departments, department, loading, fetchDepartments, fetchDepartmentById, updateDepartment }}>
       {children}
     </DepartmentContext.Provider>
   );

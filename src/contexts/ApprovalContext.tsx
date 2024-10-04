@@ -36,8 +36,9 @@ type ApprovalContextData = {
   loading: boolean;
   fetchApprovals: () => Promise<void>;
   fetchApprovalById: (id: number) => Promise<void>;
-  fetchProcessLogs: (approvalId: number) => Promise<void>;
+  fetchProcessLogs: (processId: number) => Promise<void>;
   handleAction: (action: string, processId: number) => Promise<void>;
+  createApproval: (data: Omit<Approval, 'id' | 'createdById'>) => Promise<void>;
 };
 
 type ApprovalProviderProps = {
@@ -81,18 +82,17 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
   }
 
   // Fetch process logs (history)
-    async function fetchProcessLogs(processId: number) {
-        setLoading(true);
-        try {
-        const response = await api.get(`/activity-log/${processId}`); // Busca o histórico pela rota correta
-        setProcessLogs(response.data); 
-        } catch (error) {
-        toast.error("Erro ao buscar histórico do processo");
-        } finally {
-        setLoading(false);
-        }
+  async function fetchProcessLogs(processId: number) {
+    setLoading(true);
+    try {
+      const response = await api.get(`/activity-log/${processId}`); // Busca o histórico pela rota correta
+      setProcessLogs(response.data);
+    } catch (error) {
+      toast.error("Erro ao buscar histórico do processo");
+    } finally {
+      setLoading(false);
     }
-  
+  }
 
   // Handle actions: approve, reject, cancel
   async function handleAction(action: string, processId: number) {
@@ -104,6 +104,20 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
       toast.success(`Aprovação ${action} com sucesso!`);
     } catch (error) {
       toast.error("Erro ao executar a ação");
+    }
+  }
+
+  // Create a new approval
+  async function createApproval(data: Omit<Approval, 'id' | 'createdById'>) {
+    setLoading(true);
+    try {
+      await api.post('/approval', data);
+      toast.success('Aprovação criada com sucesso!');
+      await fetchApprovals(); // Atualiza a lista de aprovações após a criação
+    } catch (error) {
+      toast.error('Erro ao criar aprovação');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -119,6 +133,7 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
         fetchApprovalById,
         fetchProcessLogs,
         handleAction,
+        createApproval, // Adicionando a função createApproval ao contexto
       }}
     >
       {children}

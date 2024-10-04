@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState, useEffect } from 'react';
+import { createContext, ReactNode, useState } from 'react';
 import { api } from '../services/apiClient';
 
 type Category = {
@@ -13,6 +13,7 @@ type CategoryContextData = {
   loading: boolean;
   fetchCategories: () => Promise<void>;
   fetchCategoryById: (id: number) => Promise<void>;
+  updateCategory: (id: number, data: Partial<Category>) => Promise<void>;
 };
 
 type CategoryProviderProps = {
@@ -46,14 +47,30 @@ export function CategoryProvider({ children }: CategoryProviderProps) {
       const response = await api.get(`/category/${id}`);
       setCategory(response.data);
     } catch (error) {
-      console.error('Erro ao buscar a categoria:', error);
+      console.error('Erro ao buscar detalhes da categoria:', error);
+      setCategory(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Update category by ID
+  async function updateCategory(id: number, data: Partial<Category>) {
+    setLoading(true);
+    try {
+      await api.put(`/category/${id}`, data);
+      await fetchCategoryById(id); // Atualiza o estado da categoria após a atualização
+    } catch (error) {
+      console.error('Erro ao atualizar categoria:', error);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <CategoryContext.Provider value={{ categories, category, loading, fetchCategories, fetchCategoryById }}>
+    <CategoryContext.Provider
+      value={{ categories, category, loading, fetchCategories, fetchCategoryById, updateCategory }}
+    >
       {children}
     </CategoryContext.Provider>
   );

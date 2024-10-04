@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
+import Link from 'next/link';
 
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -19,7 +20,7 @@ export default function Home() {
 
         <section className={styles.infoSection}>
           <div className={styles.infoCard}>
-            <h2>Suas Aprovações</h2>
+            <Link href="/approvallist">Suas Aprovações</Link>
             <p>Aqui será mostrado um resumo das aprovações mais recentes.</p>
           </div>
 

@@ -1,56 +1,114 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
-import { DepartmentContext } from '../../../contexts/DepartmentContext';
+import { api } from '../../../services/apiClient';
 import { Button } from '../../../components/ui/Button';
+import { Input, TextArea } from '../../../components/ui/Input';
 import styles from './styles.module.scss';
-import { Header } from '../../../components/Header';
 import { canSSRAuth } from '../../../utils/canSSRAuth';
-import Head from 'next/head';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { Header } from '../../../components/Header';
+import { DepartmentContext } from '../../../contexts/DepartmentContext';
 
-const Department = () => {
-  const { department, fetchDepartmentById, loading } = useContext(DepartmentContext);
-  const { user } = useContext(AuthContext); // Verifica a role se necessário
+const UpdateDepartment = () => {
+  const { department, fetchDepartmentById, updateDepartment } = useContext(DepartmentContext);
   const router = useRouter();
   const { id } = router.query;
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true); // Para indicar o carregamento inicial dos dados
+  const [code, setCode] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
+  // Fetch department details by ID
   useEffect(() => {
-    if (id) {
-      fetchDepartmentById(Number(id));
+    async function loadDepartment() {
+      if (id && !isNaN(Number(id))) {
+        try {
+          await fetchDepartmentById(Number(id)); // Aguarda o fetch dos dados
+          if (department) {
+            setCode(department.code);
+            setName(department.name);
+            setDescription(department.description || '');
+          }
+        } catch (error) {
+          console.error('Error fetching department:', error);
+        } finally {
+          setInitialLoading(false); // O carregamento inicial é finalizado
+        }
+      }
     }
-  }, [id]);
+    loadDepartment();
+  }, [id, fetchDepartmentById]);
 
-  if (loading) {
-    return <p>Carregando...</p>;
+  // Handle form submission for updating department
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+
+    if (code === '' || name === '') {
+      alert('Code and name are required');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await updateDepartment(Number(id), {
+        code,
+        name,
+        description,
+      });
+      alert('Department updated successfully!');
+      router.push('/departmentlist');
+    } catch (error) {
+      console.error('Error updating department:', error);
+      alert('Failed to update department');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  if (!department) {
-    return <p>Departamento não encontrado</p>;
+  if (initialLoading) {
+    return <p>Loading department details...</p>; // Exibe enquanto carrega os dados iniciais
   }
 
   return (
     <>
-      <Head>
-        <title>Workflows - Detalhes do Departamento</title>
-      </Head>
       <Header />
-      <div className={styles.departmentDetailContainer}>
-        <h1>{department.name}</h1>
-        <p><strong>Código:</strong> {department.code}</p>
-        {department.description && <p><strong>Descrição:</strong> {department.description}</p>}
-        <Button onClick={() => router.push('/departmentlist')}>
-          Voltar para Lista
-        </Button>
+      <div className={styles.createDepartmentContainer}>
+        <h1 className={styles.title}>Update Department</h1>
+        <form onSubmit={handleSubmit} className={styles.formContainer}>
+          <Input
+            type="text"
+            placeholder="Department Code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+          <Input
+            type="text"
+            placeholder="Department Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <TextArea
+            placeholder="Department Description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <Button type="submit" loading={loading}>
+            {loading ? 'Updating...' : 'Update Department'}
+          </Button>
+        </form>
       </div>
     </>
   );
 };
 
-// Protege a página, apenas usuários logados podem acessar
+// Protege a página para usuários autenticados
 export const getServerSideProps = canSSRAuth(async () => {
   return {
     props: {}
   };
 });
 
-export default Department;
+export default UpdateDepartment;
