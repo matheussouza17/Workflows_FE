@@ -1,17 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { CategoryContext } from '../../contexts/CategoryContext';
-import { Button } from '../../components/ui/Button';
-import styles from './styles.module.scss';
 import { Header } from '../../components/Header';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import Head from 'next/head';
-import { AuthContext } from '../../contexts/AuthContext';
-import { FaPlus } from 'react-icons/fa'; // Biblioteca para ícones
+import FilterAndActions from '../../components/FilterAndActions';
+import DataTable from '../../components/DataTable';
+import styles from './styles.module.scss';
+import MainLayout from '../../components/MainLayout';
 
 const CategoryList = () => {
   const { categories, fetchCategories, loading } = useContext(CategoryContext);
-  const { user } = useContext(AuthContext);
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +26,13 @@ const CategoryList = () => {
     );
   };
 
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { key: 'description', label: 'Description' }
+  ];
+
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Workflows - Categories</title>
@@ -36,56 +41,27 @@ const CategoryList = () => {
       <div className={styles.categoryListContainer}>
         <h1 className={styles.title}>Categories</h1>
 
-        {/* Campo de busca */}
-        <input
-          type="text"
-          placeholder="Search by name"
-          className={styles.searchInput}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        <FilterAndActions
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          buttonLabel="Create New Category"
+          onButtonClick={() => router.push('/category/create')}
         />
-
-        {/* Botão para criar nova categoria */}
-        <div className={styles.createButtonContainer}>
-          <Button
-            className={styles.createButton}
-            onClick={() => router.push('/category/create')}
-          >
-            <FaPlus className={styles.plusIcon} /> Create New Category
-          </Button>
-        </div>
 
         {loading ? (
           <div className={styles.loading}>Loading...</div>
         ) : (
-          <table className={styles.categoryTable}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filterCategories().map((category) => (
-                <tr key={category.id}>
-                  <td>{category.name}</td>
-                  <td>{category.description || 'No description'}</td>
-                  <td>
-                    <Button
-                      className={styles.actionButton}
-                      onClick={() => router.push(`/category/${category.id}`)}
-                    >
-                      View Details
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            data={filterCategories()}
+            columns={columns}
+            onRowClick={(category) => router.push(`/category/${category.id}`)}
+            actionLabel="View Details"
+            onActionClick={(category) => router.push(`/category/${category.id}`)}
+          />
         )}
       </div>
     </>
+    </MainLayout>
   );
 };
 

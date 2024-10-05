@@ -7,6 +7,7 @@ import styles from './create.module.scss';
 import { Header } from '../../components/Header';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import Head from 'next/head';
+import MainLayout from '../../components/MainLayout';
 
 const CreateApproval = () => {
   const { createApproval, loading } = useContext(ApprovalContext);
@@ -40,6 +41,7 @@ const CreateApproval = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Criar Aprovação</title>
@@ -87,6 +89,7 @@ const CreateApproval = () => {
         </form>
       </div>
     </>
+  </MainLayout>
   );
 };
 

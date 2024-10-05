@@ -7,6 +7,7 @@ import styles from './styles.module.scss';
 import { canSSRAuth } from '../../../utils/canSSRAuth';
 import { Header } from '../../../components/Header';
 import { DepartmentContext } from '../../../contexts/DepartmentContext';
+import MainLayout from '../../../components/MainLayout';
 
 const UpdateDepartment = () => {
   const { department, fetchDepartmentById, updateDepartment } = useContext(DepartmentContext);
@@ -71,6 +72,7 @@ const UpdateDepartment = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Header />
       <div className={styles.createDepartmentContainer}>
@@ -101,6 +103,7 @@ const UpdateDepartment = () => {
         </form>
       </div>
     </>
+    </MainLayout>
   );
 };
 

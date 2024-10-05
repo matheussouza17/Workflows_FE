@@ -3,7 +3,7 @@ import Image from 'next/image';
 import logoImg from '../../public/workflows-logo.png'; // Ajuste o caminho da logo se necessário
 import styles from '../../styles/home.module.scss';
 import { useContext, FormEvent, useState } from 'react';
-
+import MainLayout from '../components/MainLayout';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { AuthContext } from '../contexts/AuthContext';
@@ -40,6 +40,7 @@ export default function Home() {
   }
 
   return (
+    <MainLayout withSidebar={false}>
     <>
       <Head>
         <title>Workflows - Login</title>
@@ -81,6 +82,7 @@ export default function Home() {
         </div>
       </div>
     </>
+  </MainLayout>
   );
 }
 

@@ -1,99 +1,67 @@
-.headerContainer {
-  height: 5rem;
-  width: 100%; // Certifique-se de que o header ocupa 100% da largura
+// styles.module.scss
+
+.sidebarContainer {
+  height: 100vh; // Altura completa da tela
+  width: 250px; // Largura do menu lateral
+  position: fixed; // Fixa na lateral esquerda
+  left: 0;
+  top: 0;
+  background-color: #333; // Cor de fundo
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.headerContent {
-  max-width: 100%;
-  height: 5rem;
-  margin: 0 auto;
-  padding: 0 2rem;
-  margin-top: 0.5rem;
+.sidebarContent {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  width: 100%;
 
   img {
     cursor: pointer;
+    margin-bottom: 2rem; // Espaçamento abaixo do logo
   }
 }
 
 .menuNav {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  flex-grow: 1; // Permite que o menu cresça para ocupar o espaço disponível
-  justify-content: flex-end; // Alinha o menu à direita
+  width: 100%;
+  margin-top: 2rem;
 
   a {
     color: var(--white);
-    padding: 0 0.5rem;
-    white-space: nowrap; // Garante que o texto não quebre
-    display: inline-block;
-    position: relative;
-    transition: color 0.7s;
-
-    & + a {
-      margin-left: 2rem;
-    }
+    padding: 1rem;
+    text-decoration: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.3s;
 
     &:hover {
-      color: var(--red-900);
+      background-color: var(--dark-700);
     }
   }
 
-  button {
-    margin-left: 2rem;
+
+
+  .logoutButton {
+    margin-top: 2rem;
     background: transparent;
-    border: 0;
+    border: none;
+    cursor: pointer;
     transition: transform 0.8s;
+    align-self: flex-start;
 
     &:hover {
       transform: scale(1.2);
     }
   }
+}
 
-  .profileContainer {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    margin-left: 2%;
-    color: var(--white);
-
-    .profilePhoto {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 0.5rem;
-    }
-
-    .dropdownMenu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: grayscale($color: #dfdede);
-      border: 1px solid var(--gray-100);
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-      padding: 0.5rem;
-      z-index: 1000;
-
-      a, button {
-        display: block;
-        padding: 0.5rem 1rem;
-        color: var(--black);
-        text-decoration: none;
-        transition: background 0.3s;
-
-        &:hover {
-          background: var(--gray-100);
-        }
-      }
-
-      button {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-      }
-    }
-  }
+.profilePhoto{
+  border-radius: 40%;
 }

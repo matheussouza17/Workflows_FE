@@ -5,11 +5,13 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
 import Link from 'next/link';
+import MainLayout from '../../components/MainLayout';
 
 export default function Home() {
   const { user } = useContext(AuthContext);
 
   return (
+    <MainLayout>
     <>
     <Header />
       <Head>
@@ -36,6 +38,7 @@ export default function Home() {
         </section>
       </div>
     </>
+    </MainLayout>
   );
 }
 

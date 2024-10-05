@@ -6,6 +6,7 @@ import styles from './styles.module.scss';
 import { Header } from '../../../components/Header';
 import { canSSRAuth } from '../../../utils/canSSRAuth';
 import Head from 'next/head';
+import MainLayout from '../../../components/MainLayout';
 
 const ApprovalDetail = () => {
   const { approval, process, processLogs, loading, fetchApprovalById, fetchProcessLogs, handleAction } = useContext(ApprovalContext);
@@ -34,6 +35,7 @@ const ApprovalDetail = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Workflows - Detalhes da Aprovação</title>
@@ -45,13 +47,13 @@ const ApprovalDetail = () => {
           <button
             onClick={() => setActiveTab('details')}
             className={activeTab === 'details' ? styles.activeTab : ''}
-          >
+            >
             Detalhes
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={activeTab === 'history' ? styles.activeTab : ''}
-          >
+            >
             Histórico
           </button>
         </div>
@@ -121,6 +123,7 @@ const ApprovalDetail = () => {
         )}
       </div>
     </>
+  </MainLayout>
   );
 };
 

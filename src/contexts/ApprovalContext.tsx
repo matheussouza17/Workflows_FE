@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useCallback } from 'react';
 import { api } from '../services/apiClient';
 import { toast } from 'react-toastify';
 
@@ -55,7 +55,7 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
   const [loading, setLoading] = useState(false);
 
   // Fetch all approvals
-  async function fetchApprovals() {
+  const fetchApprovals = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get('/approvals');
@@ -65,7 +65,7 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   // Fetch approval details by ID
   async function fetchApprovalById(id: number) {
@@ -133,7 +133,7 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
         fetchApprovalById,
         fetchProcessLogs,
         handleAction,
-        createApproval, // Adicionando a função createApproval ao contexto
+        createApproval,
       }}
     >
       {children}

@@ -7,6 +7,7 @@ import { Header } from '../../../components/Header';
 import { canSSRAuth } from '../../../utils/canSSRAuth';
 import Head from 'next/head';
 import { AuthContext } from '../../../contexts/AuthContext';
+import MainLayout from '../../../components/MainLayout';
 
 const Category = () => {
   const { category, fetchCategoryById, loading } = useContext(CategoryContext);
@@ -29,6 +30,7 @@ const Category = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Workflows - Detalhes da Categoria</title>
@@ -44,6 +46,7 @@ const Category = () => {
         <Button onClick={() => router.push('/categorylist')}>Voltar para Lista</Button>
       </div>
     </>
+    </MainLayout>
   );
 };
 

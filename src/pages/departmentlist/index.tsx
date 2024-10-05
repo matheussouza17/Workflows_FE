@@ -1,17 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DepartmentContext } from '../../contexts/DepartmentContext';
-import { Button } from '../../components/ui/Button';
-import styles from './styles.module.scss';
 import { Header } from '../../components/Header';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import Head from 'next/head';
-import { AuthContext } from '../../contexts/AuthContext';
-import { FaPlus } from 'react-icons/fa'; // Biblioteca para ícones
+import FilterAndActions from '../../components/FilterAndActions';
+import DataTable from '../../components/DataTable';
+import styles from './styles.module.scss';
+import MainLayout from '../../components/MainLayout';
 
 const DepartmentList = () => {
   const { departments, fetchDepartments, loading } = useContext(DepartmentContext);
-  const { user } = useContext(AuthContext);
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +26,13 @@ const DepartmentList = () => {
     );
   };
 
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { key: 'code', label: 'Code' }
+  ];
+
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Workflows - Departments</title>
@@ -36,60 +41,30 @@ const DepartmentList = () => {
       <div className={styles.departmentListContainer}>
         <h1 className={styles.title}>Departments</h1>
 
-        {/* Campo de busca */}
-        <input
-          type="text"
-          placeholder="Search by name"
-          className={styles.searchInput}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        <FilterAndActions
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          buttonLabel="Create New Department"
+          onButtonClick={() => router.push('/department/create')}
         />
-
-        {/* Botão para criar novo departamento */}
-        <div className={styles.createButtonContainer}>
-          <Button
-            className={styles.createButton}
-            onClick={() => router.push('/department/create')}
-          >
-            <FaPlus className={styles.plusIcon} /> Create New Department
-          </Button>
-        </div>
 
         {loading ? (
           <div className={styles.loading}>Loading...</div>
         ) : (
-          <table className={styles.departmentTable}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Code</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filterDepartments().map((department) => (
-                <tr key={department.id}>
-                  <td>{department.name}</td>
-                  <td>{department.code}</td>
-                  <td>
-                    <Button
-                      className={styles.actionButton}
-                      onClick={() => router.push(`/department/${department.id}`)}
-                    >
-                      View Details
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            data={filterDepartments()}
+            columns={columns}
+            onRowClick={(department) => router.push(`/department/${department.id}`)}
+            actionLabel="View Details"
+            onActionClick={(department) => router.push(`/department/${department.id}`)}
+          />
         )}
       </div>
     </>
+    </MainLayout>
   );
 };
 
-// Protege a página, apenas usuários logados podem acessar
 export const getServerSideProps = canSSRAuth(async () => {
   return {
     props: {}

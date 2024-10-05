@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input';
 import styles from './create.module.scss';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
+import MainLayout from '../../components/MainLayout';
 
 const CreateCategory = () => {
   const [name, setName] = useState('');
@@ -37,6 +38,7 @@ const CreateCategory = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Header />
       <div className={styles.createCategoryContainer}>
@@ -55,6 +57,7 @@ const CreateCategory = () => {
         </form>
       </div>
     </>
+    </MainLayout>
   );
 };
 

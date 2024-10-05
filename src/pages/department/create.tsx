@@ -6,6 +6,7 @@ import { Input, TextArea } from '../../components/ui/Input';
 import styles from './create.module.scss';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
+import MainLayout from '../../components/MainLayout';
 
 const CreateDepartment = () => {
   const [code, setCode] = useState('');
@@ -41,6 +42,7 @@ const CreateDepartment = () => {
   }
 
   return (
+    <MainLayout>
     <>
       <Header />
       <div className={styles.createDepartmentContainer}>
@@ -71,6 +73,7 @@ const CreateDepartment = () => {
         </form>
       </div>
     </>
+    </MainLayout>
   );
 };
 

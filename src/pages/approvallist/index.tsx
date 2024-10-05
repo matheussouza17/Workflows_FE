@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ApprovalContext } from '../../contexts/ApprovalContext';
-import { Button } from '../../components/ui/Button';
-import styles from './styles.module.scss';
 import { Header } from '../../components/Header';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import Head from 'next/head';
-import { FaPlus } from 'react-icons/fa';
+import FilterAndActions from '../../components/FilterAndActions';
+import DataTable from '../../components/DataTable';
+import styles from './styles.module.scss';
+import MainLayout from '../../components/MainLayout';
 
 const ApprovalList = () => {
   const { approvals, fetchApprovals, loading } = useContext(ApprovalContext);
@@ -26,7 +27,16 @@ const ApprovalList = () => {
     );
   };
 
+  // Definindo as colunas da tabela
+  const columns = [
+    { key: 'number', label: 'Número' },
+    { key: 'name', label: 'Nome' },
+    { key: 'categoryId', label: 'Categoria' },
+    { key: 'value', label: 'Valor' }
+  ];
+
   return (
+    <MainLayout>
     <>
       <Head>
         <title>Workflows - Aprovações</title>
@@ -35,61 +45,29 @@ const ApprovalList = () => {
       <div className={styles.approvalListContainer}>
         <h1 className={styles.title}>Aprovações</h1>
 
-        {/* Campo de busca */}
-        <input
-          type="text"
-          placeholder="Buscar por nome ou número"
-          className={styles.searchInput}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        <FilterAndActions
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          buttonLabel="Criar Nova Aprovação"
+          onButtonClick={() => router.push('/approval/create')}
         />
-
-        {/* Botão para criar nova aprovação */}
-        <div className={styles.createButtonContainer}>
-          <Button
-            className={styles.createButton}
-            onClick={() => router.push('/approval/create')}
-          >
-            <FaPlus className={styles.plusIcon} /> Criar Nova Aprovação
-          </Button>
-        </div>
 
         {loading ? (
           <div className={styles.loading}>Carregando...</div>
         ) : approvals.length === 0 ? (
           <p>Nenhuma aprovação encontrada.</p>
         ) : (
-          <table className={styles.approvalTable}>
-            <thead>
-              <tr>
-                <th>Número</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Valor</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filterApprovals().map((approval) => (
-                <tr key={approval.id}>
-                  <td>{approval.number}</td>
-                  <td>{approval.name}</td>
-                  <td>{approval.categoryId}</td>
-                  <td>R$ {approval.value.toFixed(2)}</td>
-                  <td>
-                    <Button
-                      onClick={() => router.push(`/approval/${approval.id}`)}
-                    >
-                      Ver Detalhes
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            data={filterApprovals()}
+            columns={columns}
+            onRowClick={(approval) => router.push(`/approval/${approval.id}`)}
+            actionLabel="Ver Detalhes"
+            onActionClick={(approval) => router.push(`/approval/${approval.id}`)}
+          />
         )}
       </div>
     </>
+    </MainLayout>
   );
 };
 
