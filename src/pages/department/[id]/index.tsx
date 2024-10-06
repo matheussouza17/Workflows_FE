@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
-import { api } from '../../../services/apiClient';
 import { Button } from '../../../components/ui/Button';
 import { Input, TextArea } from '../../../components/ui/Input';
 import styles from './styles.module.scss';
@@ -10,35 +9,46 @@ import { DepartmentContext } from '../../../contexts/DepartmentContext';
 import MainLayout from '../../../components/MainLayout';
 
 const UpdateDepartment = () => {
-  const { department, fetchDepartmentById, updateDepartment } = useContext(DepartmentContext);
+  const { fetchDepartmentById, updateDepartment } = useContext(DepartmentContext);
   const router = useRouter();
   const { id } = router.query;
+
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true); // Para indicar o carregamento inicial dos dados
+  const [departmentLoading, setDepartmentLoading] = useState(true);
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   // Fetch department details by ID
   useEffect(() => {
+    if (!id || isNaN(Number(id))) return;
+
+    let isMounted = true; // Para garantir que o componente está montado antes de setar estado
+
     async function loadDepartment() {
-      if (id && !isNaN(Number(id))) {
-        try {
-          await fetchDepartmentById(Number(id)); // Aguarda o fetch dos dados
-          if (department) {
-            setCode(department.code);
-            setName(department.name);
-            setDescription(department.description || '');
-          }
-        } catch (error) {
-          console.error('Error fetching department:', error);
-        } finally {
-          setInitialLoading(false); // O carregamento inicial é finalizado
+      setDepartmentLoading(true);
+      try {
+        const departmentData = await fetchDepartmentById(Number(id));
+        if (departmentData && isMounted) {
+          setCode(departmentData.code);
+          setName(departmentData.name);
+          setDescription(departmentData.description || '');
+        }
+      } catch (error) {
+        console.error('Error fetching department:', error);
+      } finally {
+        if (isMounted) {
+          setDepartmentLoading(false);
         }
       }
     }
+
     loadDepartment();
-  }, [id, fetchDepartmentById]);
+
+    return () => {
+      isMounted = false; // Marca como desmontado para evitar atualização de estado
+    };
+  }, [id]);
 
   // Handle form submission for updating department
   async function handleSubmit(event: FormEvent) {
@@ -67,42 +77,42 @@ const UpdateDepartment = () => {
     }
   }
 
-  if (initialLoading) {
-    return <p>Loading department details...</p>; // Exibe enquanto carrega os dados iniciais
+  if (departmentLoading) {
+    return <p>Loading department details...</p>;
   }
 
   return (
     <MainLayout>
-    <>
-      <Header />
-      <div className={styles.createDepartmentContainer}>
-        <h1 className={styles.title}>Update Department</h1>
-        <form onSubmit={handleSubmit} className={styles.formContainer}>
-          <Input
-            type="text"
-            placeholder="Department Code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            required
-          />
-          <Input
-            type="text"
-            placeholder="Department Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <TextArea
-            placeholder="Department Description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <Button type="submit" loading={loading}>
-            {loading ? 'Updating...' : 'Update Department'}
-          </Button>
-        </form>
-      </div>
-    </>
+      <>
+        <Header />
+        <div className={styles.createDepartmentContainer}>
+          <h1 className={styles.title}>Update Department</h1>
+          <form onSubmit={handleSubmit} className={styles.formContainer}>
+            <Input
+              type="text"
+              placeholder="Department Code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              required
+            />
+            <Input
+              type="text"
+              placeholder="Department Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <TextArea
+              placeholder="Department Description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <Button type="submit" loading={loading}>
+              {loading ? 'Updating...' : 'Update Department'}
+            </Button>
+          </form>
+        </div>
+      </>
     </MainLayout>
   );
 };
@@ -110,7 +120,7 @@ const UpdateDepartment = () => {
 // Protege a página para usuários autenticados
 export const getServerSideProps = canSSRAuth(async () => {
   return {
-    props: {}
+    props: {},
   };
 });
 

@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useState, useEffect } from 'react';
+import { createContext, ReactNode, useState } from 'react';
 import { api } from '../services/apiClient';
 
 type Department = {
   id: number;
-  name: string;
   code: string;
+  name: string;
   description?: string;
 };
 
@@ -13,7 +13,7 @@ type DepartmentContextData = {
   department: Department | null;
   loading: boolean;
   fetchDepartments: () => Promise<void>;
-  fetchDepartmentById: (id: number) => Promise<void>;
+  fetchDepartmentById: (id: number) => Promise<Department | null>;
   updateDepartment: (id: number, data: Partial<Department>) => Promise<void>;
 };
 
@@ -42,17 +42,20 @@ export function DepartmentProvider({ children }: DepartmentProviderProps) {
   }
 
   // Fetch department by ID
-  async function fetchDepartmentById(id: number) {
+  async function fetchDepartmentById(id: number): Promise<Department | null> {
     setLoading(true);
     try {
       const response = await api.get(`/department/${id}`);
-      setDepartment(response.data);
+      if (response.data) {
+        setDepartment(response.data);
+        return response.data; // Retorna os dados do departamento
+      }
     } catch (error) {
-      console.error("Erro ao buscar detalhes do departamento:", error);
-      setDepartment(null);
+      console.error('Erro ao buscar o departamento:', error);
     } finally {
       setLoading(false);
     }
+    return null; // Retorna `null` em caso de erro
   }
 
   // Update department by ID

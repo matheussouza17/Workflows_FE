@@ -39,23 +39,23 @@ const ApprovalList = () => {
     <MainLayout>
     <>
       <Head>
-        <title>Workflows - Aprovações</title>
+        <title>Workflows - Approvals</title>
       </Head>
       <Header />
       <div className={styles.approvalListContainer}>
-        <h1 className={styles.title}>Aprovações</h1>
+        <h1 className={styles.title}>Approvals</h1>
 
         <FilterAndActions
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          buttonLabel="Criar Nova Aprovação"
+          buttonLabel="Create New Approvals"
           onButtonClick={() => router.push('/approval/create')}
         />
 
         {loading ? (
-          <div className={styles.loading}>Carregando...</div>
+          <div className={styles.loading}>Loading...</div>
         ) : approvals.length === 0 ? (
-          <p>Nenhuma aprovação encontrada.</p>
+          <p>No approvals found.</p>
         ) : (
           <DataTable
             data={filterApprovals()}

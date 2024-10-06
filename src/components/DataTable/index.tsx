@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import styles from './styles.module.scss';
 
 type DataTableProps<T> = {
@@ -9,7 +8,7 @@ type DataTableProps<T> = {
   onActionClick?: (item: T) => void;
 };
 
-const DataTable = <T,>({ data, columns, onRowClick, actionLabel, onActionClick }: DataTableProps<T>) => {
+const DataTable = <T,>({ data, columns, onRowClick }: DataTableProps<T>) => {
   return (
     <table className={styles.dataTable}>
       <thead>
@@ -17,7 +16,6 @@ const DataTable = <T,>({ data, columns, onRowClick, actionLabel, onActionClick }
           {columns.map((col) => (
             <th key={String(col.key)}>{col.label}</th>
           ))}
-          {onActionClick && <th>Actions</th>}
         </tr>
       </thead>
       <tbody>
@@ -28,19 +26,6 @@ const DataTable = <T,>({ data, columns, onRowClick, actionLabel, onActionClick }
                 {col.render ? col.render(item) : String(item[col.key as keyof T])}
               </td>
             ))}
-            {onActionClick && (
-              <td>
-                <button
-                  className={styles.actionButton}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Evita chamar `onRowClick` quando o botão é clicado
-                    onActionClick(item);
-                  }}
-                >
-                  {actionLabel}
-                </button>
-              </td>
-            )}
           </tr>
         ))}
       </tbody>
