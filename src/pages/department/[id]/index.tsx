@@ -1,61 +1,64 @@
 import { useContext, useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '../../../components/ui/Button';
-import { Input, TextArea } from '../../../components/ui/Input';
+import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
 import styles from './styles.module.scss';
 import { canSSRAuth } from '../../../utils/canSSRAuth';
 import { Header } from '../../../components/Header';
 import { DepartmentContext } from '../../../contexts/DepartmentContext';
+import { UserContext } from '../../../contexts/UserContext';
 import MainLayout from '../../../components/MainLayout';
+import { toast } from 'react-toastify';
 
 const UpdateDepartment = () => {
   const { fetchDepartmentById, updateDepartment } = useContext(DepartmentContext);
+  const { getUsers, users } = useContext(UserContext);
   const router = useRouter();
   const { id } = router.query;
 
   const [loading, setLoading] = useState(false);
-  const [departmentLoading, setDepartmentLoading] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [approvalDirectorId, setApprovalDirectorId] = useState<string | null>(null);
 
-  // Fetch department details by ID
+  // Fetch department details by ID once on component mount
   useEffect(() => {
-    if (!id || isNaN(Number(id))) return;
+    if (!router.isReady || !id || isNaN(Number(id))) return;
 
-    let isMounted = true; // Para garantir que o componente está montado antes de setar estado
-
-    async function loadDepartment() {
-      setDepartmentLoading(true);
+    const loadDepartment = async () => {
+      setIsLoadingData(true);
       try {
         const departmentData = await fetchDepartmentById(Number(id));
-        if (departmentData && isMounted) {
-          setCode(departmentData.code);
-          setName(departmentData.name);
-          setDescription(departmentData.description || '');
+        if (departmentData) {
+          setCode(departmentData.code || '');
+          setName(departmentData.name || '');
+          setApprovalDirectorId(departmentData.approvalDirectorId || null);
         }
       } catch (error) {
         console.error('Error fetching department:', error);
       } finally {
-        if (isMounted) {
-          setDepartmentLoading(false);
-        }
+        setIsLoadingData(false);
       }
-    }
+    };
 
     loadDepartment();
+  }, [router.isReady, id]);
 
-    return () => {
-      isMounted = false; // Marca como desmontado para evitar atualização de estado
-    };
-  }, [id]);
+  // Fetch users for approvalDirector dropdown once
+  useEffect(() => {
+    if (users.length === 0) {
+      getUsers(); // Deve trazer somente diretores disponíveis
+    }
+  }, [getUsers, users.length]);
 
   // Handle form submission for updating department
-  async function handleSubmit(event: FormEvent) {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
     if (code === '' || name === '') {
-      alert('Code and name are required');
+      toast.warning('Code and name are required');
       return;
     }
 
@@ -65,19 +68,19 @@ const UpdateDepartment = () => {
       await updateDepartment(Number(id), {
         code,
         name,
-        description,
+        approvalDirectorId: approvalDirectorId || null,
       });
-      alert('Department updated successfully!');
+      toast.success('Department updated successfully!');
       router.push('/departmentlist');
     } catch (error) {
+      toast.error('Failed to update department');
       console.error('Error updating department:', error);
-      alert('Failed to update department');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  if (departmentLoading) {
+  if (isLoadingData) {
     return <p>Loading department details...</p>;
   }
 
@@ -102,11 +105,17 @@ const UpdateDepartment = () => {
               onChange={(e) => setName(e.target.value)}
               required
             />
-            <TextArea
-              placeholder="Department Description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <Select
+              value={approvalDirectorId || ''}
+              onChange={(e) => setApprovalDirectorId(e.target.value || null)}
+            >
+              <option value="">Select Approval Director (Optional)</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name} ({user.role})
+                </option>
+              ))}
+            </Select>
             <Button type="submit" loading={loading}>
               {loading ? 'Updating...' : 'Update Department'}
             </Button>

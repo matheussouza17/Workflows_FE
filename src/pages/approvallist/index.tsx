@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ApprovalContext } from '../../contexts/ApprovalContext';
+import { CategoryContext } from '../../contexts/CategoryContext';
 import { Header } from '../../components/Header';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import Head from 'next/head';
@@ -11,12 +12,14 @@ import MainLayout from '../../components/MainLayout';
 
 const ApprovalList = () => {
   const { approvals, fetchApprovals, loading } = useContext(ApprovalContext);
+  const { categories, fetchCategories } = useContext(CategoryContext);
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchApprovals();
-  }, [fetchApprovals]);
+    fetchCategories();
+  }, []);
 
   // Função para filtrar aprovações pelo nome ou número
   const filterApprovals = () => {
@@ -27,13 +30,25 @@ const ApprovalList = () => {
     );
   };
 
+  // Função para obter o nome da categoria pelo ID
+  const getCategoryNameById = (categoryId:number) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : 'N/A';
+  };
+
   // Definindo as colunas da tabela
   const columns = [
     { key: 'number', label: 'Número' },
     { key: 'name', label: 'Nome' },
-    { key: 'categoryId', label: 'Categoria' },
+    { key: 'categoryName', label: 'Categoria' },
     { key: 'value', label: 'Valor' }
   ];
+
+  // Mapeando dados para incluir o nome da categoria
+  const dataWithCategoryNames = filterApprovals().map((approval) => ({
+    ...approval,
+    categoryName: getCategoryNameById(approval.categoryId)
+  }));
 
   return (
     <MainLayout>
@@ -58,7 +73,7 @@ const ApprovalList = () => {
           <p>No approvals found.</p>
         ) : (
           <DataTable
-            data={filterApprovals()}
+            data={dataWithCategoryNames}
             columns={columns}
             onRowClick={(approval) => router.push(`/approval/${approval.id}`)}
             actionLabel="Ver Detalhes"

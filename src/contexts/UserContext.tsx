@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState, useEffect } from 'react';
+import { createContext, ReactNode, useState } from 'react';
 import { api } from '../services/apiClient';
 import Router from 'next/router';
 import { toast } from 'react-toastify';
@@ -6,7 +6,9 @@ import { toast } from 'react-toastify';
 type UserContextData = {
   upUser: (credentials: UserProps, photo: File | null) => Promise<void>;
   getUser: () => Promise<UserProps | null>;
+  getUsers: () => Promise<UserProps[] | null>;
   removePhoto: () => void;
+  users: UserProps[]; // Armazena todos os usuários
 };
 
 export type UserProps = {
@@ -26,12 +28,13 @@ export const UserContext = createContext({} as UserContextData);
 
 export function UserProvider({ children }: UserProviderProps) {
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null); // Armazena o ID do usuário
+  const [userId, setUserId] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserProps[]>([]); // Estado para armazenar todos os usuários
 
-  // Função para buscar dados do usuário e salvar no estado
+  // Função para buscar dados do usuário logado e salvar no estado
   async function getUser(): Promise<UserProps | null> {
     try {
-      const response = await api.get('/me'); // Certifique-se que essa rota é a correta para obter o usuário logado
+      const response = await api.get('/me'); // Certifique-se de que essa rota é a correta para obter o usuário logado
       const { id, name, email, role, departmentId, photo } = response.data;
       setUserId(id);
       setUserPhoto(photo ? `data:image/jpeg;base64,${photo}` : null); // Convertendo Bytes para base64
@@ -45,7 +48,22 @@ export function UserProvider({ children }: UserProviderProps) {
         photo: photo ? `data:image/jpeg;base64,${photo}` : undefined,
       };
     } catch (err) {
-      console.log('Erro ao obter dados do usuário: ', err);
+      console.error('Erro ao obter dados do usuário: ', err);
+      return null;
+    }
+  }
+
+  // Função para buscar todos os usuários
+  async function getUsers(): Promise<UserProps[] | null> {
+    try {
+      const response = await api.get('/users'); // Certifique-se de que essa rota está correta para obter todos os usuários
+      const userList: UserProps[] = response.data;
+
+      setUsers(userList); // Atualiza o estado com a lista de usuários
+
+      return userList;
+    } catch (err) {
+      console.error('Erro ao obter dados dos usuários: ', err);
       return null;
     }
   }
@@ -81,7 +99,7 @@ export function UserProvider({ children }: UserProviderProps) {
       toast.success('Conta atualizada com sucesso!');
       Router.push('/dashboard'); // Redireciona para a dashboard
     } catch (err) {
-      console.log('Erro ao atualizar: ', err);
+      console.error('Erro ao atualizar: ', err);
       toast.error('Erro ao atualizar!');
     }
   }
@@ -93,7 +111,7 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 
   return (
-    <UserContext.Provider value={{ upUser, getUser, removePhoto }}>
+    <UserContext.Provider value={{ upUser, getUser, getUsers, removePhoto, users }}>
       {children}
     </UserContext.Provider>
   );

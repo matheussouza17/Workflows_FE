@@ -5,7 +5,7 @@ type Department = {
   id: number;
   code: string;
   name: string;
-  description?: string;
+  approvalDirectorId?: string | null
 };
 
 type DepartmentContextData = {
@@ -46,16 +46,16 @@ export function DepartmentProvider({ children }: DepartmentProviderProps) {
     setLoading(true);
     try {
       const response = await api.get(`/department/${id}`);
-      if (response.data) {
-        setDepartment(response.data);
-        return response.data; // Retorna os dados do departamento
-      }
+      if (response.data && response.data.length > 0) {
+        setDepartment(response.data[0]);
+        return response.data[0];
+      }      
     } catch (error) {
       console.error('Erro ao buscar o departamento:', error);
     } finally {
       setLoading(false);
     }
-    return null; // Retorna `null` em caso de erro
+    return null; 
   }
 
   // Update department by ID
@@ -63,7 +63,8 @@ export function DepartmentProvider({ children }: DepartmentProviderProps) {
     setLoading(true);
     try {
       await api.put(`/department/${id}`, data);
-      await fetchDepartmentById(id); // Atualiza o estado do departamento após a atualização
+      console.log(data.approvalDirectorId)
+      await fetchDepartmentById(id); 
     } catch (error) {
       console.error("Erro ao atualizar departamento:", error);
     } finally {

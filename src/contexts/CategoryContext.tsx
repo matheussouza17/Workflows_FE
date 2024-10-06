@@ -4,7 +4,7 @@ import { api } from '../services/apiClient';
 type Category = {
   id: number;
   name: string;
-  description?: string;
+  description?: string | null;
 };
 
 type CategoryContextData = {
@@ -12,7 +12,7 @@ type CategoryContextData = {
   category: Category | null;
   loading: boolean;
   fetchCategories: () => Promise<void>;
-  fetchCategoryById: (id: number) => Promise<void>;
+  fetchCategoryById: (id: number) => Promise<Category|null>;
   updateCategory: (id: number, data: Partial<Category>) => Promise<void>;
 };
 
@@ -41,17 +41,19 @@ export function CategoryProvider({ children }: CategoryProviderProps) {
   }
 
   // Fetch category by ID
-  async function fetchCategoryById(id: number) {
+  async function fetchCategoryById(id: number): Promise<Category | null> {
     setLoading(true);
     try {
       const response = await api.get(`/category/${id}`);
       setCategory(response.data);
+      return response.data[0]
     } catch (error) {
       console.error('Erro ao buscar detalhes da categoria:', error);
       setCategory(null);
     } finally {
       setLoading(false);
     }
+    return null;
   }
 
   // Update category by ID

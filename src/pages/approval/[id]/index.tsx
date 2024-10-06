@@ -71,15 +71,15 @@ const ApprovalDetail = () => {
               {process && process.status === 'Pending' && (
                 <>
                   <Button onClick={() => handleAction('Approved', process.id)}>Aprovar</Button>
-                  <Button onClick={() => handleAction('Rejected', process.id)}>Reprovar</Button>
-                  <Button onClick={() => handleAction('Cancelled', process.id)}>Cancelar</Button>
+                  <Button onClick={() => handleAction('Rejected', process.id)} className={styles.rejectButton}>Reprovar</Button>
+                  <Button onClick={() => handleAction('Cancelled', process.id)} className={styles.cancelButton}>Cancelar</Button>
                 </>
               )}
 
               {process && process.status === 'InProgress' && (
                 <>
                   <Button onClick={() => handleAction('Approved', process.id)}>Aprovar</Button>
-                  <Button onClick={() => handleAction('Rejected', process.id)}>Reprovar</Button>
+                  <Button onClick={() => handleAction('Rejected', process.id)} className={styles.rejectButton}>Reprovar</Button>
                 </>
               )}
 
@@ -109,7 +109,7 @@ const ApprovalDetail = () => {
                   {processLogs.map((log) => (
                     <tr key={log.id}>
                       <td>{log.action}</td>
-                      <td>{log.user?.name || 'Usuário não encontrado'}</td> 
+                      <td>{log.user?.name || 'Usuário não encontrado'}</td>
                       <td>{new Date(log.timestamp).toLocaleString()}</td>
                       <td>{log.description || 'N/A'}</td>
                     </tr>

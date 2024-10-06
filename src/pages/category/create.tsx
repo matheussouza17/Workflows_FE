@@ -2,13 +2,15 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import { api } from '../../services/apiClient';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Input, TextArea } from '../../components/ui/Input';
 import styles from './create.module.scss';
 import { canSSRAuth } from '../../utils/canSSRAuth';
 import { Header } from '../../components/Header';
 import MainLayout from '../../components/MainLayout';
+import { toast } from 'react-toastify';
 
 const CreateCategory = () => {
+  const [description, setDescription] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -17,7 +19,7 @@ const CreateCategory = () => {
     event.preventDefault();
 
     if (name === '') {
-      alert('O nome da categoria é obrigatório');
+      toast.warning('Name are required');
       return;
     }
 
@@ -25,13 +27,14 @@ const CreateCategory = () => {
 
     try {
       await api.post('/category', {
+        description,
         name,
       });
-      alert('Categoria criada com sucesso!');
+      toast.success('Category created successfully!');
       router.push('/categorylist');
     } catch (error) {
-      console.error('Erro ao criar categoria:', error);
-      alert('Falha ao criar categoria');
+      console.error('Error creating category:', error);
+      toast.error('Failed to create category');
     } finally {
       setLoading(false);
     }
@@ -39,24 +42,29 @@ const CreateCategory = () => {
 
   return (
     <MainLayout>
-    <>
-      <Header />
-      <div className={styles.createCategoryContainer}>
-        <h1 className={styles.title}>Criar Categoria</h1>
-        <form onSubmit={handleSubmit} className={styles.formContainer}>
-          <Input
-            type="text"
-            placeholder="Nome da Categoria"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Button type="submit" loading={loading}>
-            {loading ? 'Criando...' : 'Criar Categoria'}
-          </Button>
-        </form>
-      </div>
-    </>
+      <>
+        <Header />
+        <div className={styles.createDepartmentContainer}>
+          <h1 className={styles.title}>Create Category</h1>
+          <form onSubmit={handleSubmit} className={styles.formContainer}>
+            <Input
+              type="text"
+              placeholder="Category Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <TextArea
+              placeholder="Category Description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <Button type="submit" loading={loading}>
+              {loading ? 'Creating...' : 'Create category'}
+            </Button>
+          </form>
+        </div>
+      </>
     </MainLayout>
   );
 };
