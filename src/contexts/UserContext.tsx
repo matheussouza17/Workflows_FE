@@ -7,8 +7,10 @@ type UserContextData = {
   upUser: (credentials: UserProps, photo: File | null) => Promise<void>;
   getUser: () => Promise<UserProps | null>;
   getUsers: () => Promise<UserProps[] | null>;
+  getAllUsers: () => Promise<UserProps[] | null>;
   removePhoto: () => void;
-  users: UserProps[]; // Armazena todos os usuários
+  users: UserProps[];
+  usersAll: UserProps[];
 };
 
 export type UserProps = {
@@ -30,6 +32,7 @@ export function UserProvider({ children }: UserProviderProps) {
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [users, setUsers] = useState<UserProps[]>([]); // Estado para armazenar todos os usuários
+  const [usersAll, setAllUsers] = useState<UserProps[]>([]);
 
   // Função para buscar dados do usuário logado e salvar no estado
   async function getUser(): Promise<UserProps | null> {
@@ -68,6 +71,20 @@ export function UserProvider({ children }: UserProviderProps) {
     }
   }
 
+    // Função para buscar todos os usuários
+    async function getAllUsers(): Promise<UserProps[] | null> {
+      try {
+        const response = await api.get('/usersAll'); 
+        const userList: UserProps[] = response.data;
+  
+        setAllUsers(userList); 
+  
+        return userList;
+      } catch (err) {
+        console.error('Erro ao obter dados dos usuários: ', err);
+        return null;
+      }
+    }
   // Função para atualizar o usuário, incluindo a possibilidade de atualizar a foto
   async function upUser({ name, email, role, departmentId }: UserProps, photo: File | null) {
     try {
@@ -111,7 +128,7 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 
   return (
-    <UserContext.Provider value={{ upUser, getUser, getUsers, removePhoto, users }}>
+    <UserContext.Provider value={{ upUser, getUser, getUsers, getAllUsers, removePhoto, users, usersAll }}>
       {children}
     </UserContext.Provider>
   );

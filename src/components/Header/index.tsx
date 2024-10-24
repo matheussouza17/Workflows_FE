@@ -50,6 +50,7 @@ export function Header() {
             <>
               <Link href="/departmentlist">Departments</Link>
               <Link href="/categorylist">Categories</Link>
+              <Link href='/userslist'>Users</Link>
             </>
           )}
           <Link href="/approvallist">Approvals</Link>

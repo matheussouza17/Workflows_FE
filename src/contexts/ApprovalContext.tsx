@@ -112,10 +112,8 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
     setLoading(true);
     try {
       await api.post('/approval', data);
-      toast.success('Aprovação criada com sucesso!');
       await fetchApprovals(); // Atualiza a lista de aprovações após a criação
     } catch (error) {
-      toast.error('Erro ao criar aprovação');
     } finally {
       setLoading(false);
     }
