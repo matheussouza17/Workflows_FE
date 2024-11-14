@@ -15,6 +15,15 @@ type Approval = {
 type Process = {
   id: number;
   status: string;
+  approvalId: number;
+  departmentFromId: number;
+  departmentToId: number;
+  roleFrom: 'Employee' | 'Manager' | 'Director' | 'Accounting' | 'CFO';
+  roleTo: 'Employee' | 'Manager' | 'Director' | 'Accounting' | 'CFO';
+  executedById: number;
+  userToId?: number;
+  comment?: string;
+  action: 'Approved' | 'Rejected' | 'Cancelled' | 'NotExecuted';
 };
 
 type ProcessLog = {
@@ -37,7 +46,7 @@ type ApprovalContextData = {
   fetchApprovals: () => Promise<void>;
   fetchApprovalById: (id: number) => Promise<void>;
   fetchProcessLogs: (processId: number) => Promise<void>;
-  handleAction: (action: string, processId: number) => Promise<void>;
+  handleAction: (action: string) => Promise<void>;
   createApproval: (data: Omit<Approval, 'id' | 'createdById'>) => Promise<void>;
 };
 
@@ -85,7 +94,7 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
   async function fetchProcessLogs(processId: number) {
     setLoading(true);
     try {
-      const response = await api.get(`/activity-log/${processId}`); // Busca o histórico pela rota correta
+      const response = await api.get(`/activity-log/${processId}`);
       setProcessLogs(response.data);
     } catch (error) {
       toast.error("Erro ao buscar histórico do processo");
@@ -95,13 +104,19 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
   }
 
   // Handle actions: approve, reject, cancel
-  async function handleAction(action: string, processId: number) {
+  async function handleAction(action: string) {
+    if (!approval?.id) {
+      toast.error("Aprovação não encontrada.");
+      return;
+    }
     try {
-      await api.put(`/process/${processId}`, {
+      await api.put(`/process/`, {
         action: action,
-        approvalId: approval?.id
+        approvalId: approval.id,
       });
       toast.success(`Aprovação ${action} com sucesso!`);
+      await fetchApprovalById(approval.id); // Atualiza aprovação e processo
+      await fetchProcessLogs(approval.id); // Atualiza logs
     } catch (error) {
       toast.error("Erro ao executar a ação");
     }
@@ -113,7 +128,9 @@ export function ApprovalProvider({ children }: ApprovalProviderProps) {
     try {
       await api.post('/approval', data);
       await fetchApprovals(); // Atualiza a lista de aprovações após a criação
+      toast.success("Aprovação criada com sucesso!");
     } catch (error) {
+      toast.error("Erro ao criar aprovação");
     } finally {
       setLoading(false);
     }
